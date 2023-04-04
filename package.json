@@ -10,7 +10,7 @@
   ],
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://test.gusdk.gu.net"
   },
   "keywords": [
     "looksrare"

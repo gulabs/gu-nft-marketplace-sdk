@@ -41,6 +41,18 @@ export const CHAIN_INFO: { [chainId in SupportedChainId]: ChainInfo } = {
     rewardsSubgraphUrl: "https://api.thegraph.com/subgraphs/name/0xjurassicpunk/looks-distribution",
     cloudinaryUrl: "",
   },
+  [SupportedChainId.GU_SANDBOX]: {
+    label: "G.U.Sandbox",
+    appUrl: "http://localhost:3000", // TODO: update later
+    explorer: "https://sandbox1.japanopenchain.org",
+    rpcUrl: "https://sandbox1.japanopenchain.org:8545",
+    baseApiUrl: HARDHAT_BASE_API_URL, // TODO: update later
+    apiUrl: `${HARDHAT_BASE_API_URL}/graphql`, // TODO: update later
+    osApiUrl: "https://testnets-api.opensea.io", // TODO: update later
+    cdnUrl: "https://via.placeholder.com", // TODO: update later
+    rewardsSubgraphUrl: "https://api.thegraph.com/subgraphs/name/0xjurassicpunk/looks-distribution", // TODO: update later
+    cloudinaryUrl: "",
+  },
 };
 
 export const isSupportedChain = (chainId: number): chainId is SupportedChainId => {
