@@ -11,7 +11,7 @@
     "outputs": [
       {
         "internalType": "address",
-        "name": "transferManager",
+        "name": "",
         "type": "address"
       }
     ],
