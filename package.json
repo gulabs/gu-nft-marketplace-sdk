@@ -79,5 +79,8 @@
     "rollup-plugin-copy": "^3.4.0",
     "ts-jest": "^28.0.2",
     "typescript": "^4.6.2"
+  },
+  "dependencies": {
+    "@0xsequence/multicall": "^0.43.25"
   }
 }
