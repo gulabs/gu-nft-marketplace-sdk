@@ -1,6 +1,5 @@
 import { TypedDataSigner, TypedDataDomain } from "@ethersproject/abstract-signer";
 import { makerTypes } from "../constants/eip712";
-import { encodeOrderParams } from "../sign";
 import { MakerOrder } from "../types";
 
 /**
@@ -14,8 +13,6 @@ export const signMakerOrder = async (
   signer: TypedDataSigner,
   domain: TypedDataDomain,
   makerOrder: MakerOrder
-): Promise<string> => {
-  const { encodedParams } = encodeOrderParams(makerOrder.params);
-  
-  return signer._signTypedData(domain, makerTypes, {...makerOrder, params: encodedParams });
+): Promise<string> => {  
+  return signer._signTypedData(domain, makerTypes, makerOrder);
 };

@@ -1,14 +1,16 @@
 import { BigNumber, BigNumberish, ContractTransaction, ethers, Overrides, PayableOverrides, providers } from "ethers";
 import { addressesByNetwork, contractName, version } from "./constants";
-import { Addresses, ContractMethods, MakerOrder, Signer, SupportedChainId } from "./types";
+import { Addresses, ContractMethods, MakerOrder, OrderValidatorEnum, Signer, SupportedChainId } from "./types";
 import * as multicall from "@0xsequence/multicall";
 import { ErrorSigner, ErrorTimestamp } from "./errors";
 import { TypedDataDomain } from "@ethersproject/abstract-signer";
-import { CreateMakerAskOutput, CreateMakerBidOutput, CreateMakerInput, TakerOrder } from "./types/orders";
+import { CreateMakerAskOutput, CreateMakerBidOutput, CreateMakerInput, CreateTakerInput, TakerOrder } from "./types/orders";
 import { allowance, approve, isApprovedForAll, setApprovalForAll } from "./utils/calls/tokens";
 import { signMakerOrder } from "./utils/signMakerOrder";
 import { matchAskWithTakerBid, matchAskWithTakerBidUsingETHAndWETH, matchBidWithTakerAsk } from "./utils/calls/exchange";
 import { cancelAllOrdersForSender, cancelMultipleMakerOrders } from "./utils/calls/cancel";
+import { encodeOrderParams } from "./sign";
+import { verifyMakerOrder, verifyMakerOrders } from "./utils/calls/validator";
 
 /**
  * LooksRare
@@ -94,7 +96,7 @@ export class LooksRare {
     nonce,
     startTime = Math.floor(Date.now() / 1000),
     endTime,
-    minPercentageToAsk,
+    minPercentageToAsk = 0,
     params=[]
   }: CreateMakerInput): Promise<CreateMakerAskOutput> {
     const signer = this.getSigner();
@@ -121,7 +123,7 @@ export class LooksRare {
       startTime,
       endTime,
       minPercentageToAsk,
-      params,
+      params: encodeOrderParams(params).encodedParams,
     };
 
     return {
@@ -145,7 +147,7 @@ export class LooksRare {
     nonce,
     startTime = Math.floor(Date.now() / 1000),
     endTime,
-    minPercentageToAsk,
+    minPercentageToAsk = 0,
     params=[]
   }: CreateMakerInput): Promise<CreateMakerBidOutput> {
     const signer = this.getSigner();
@@ -172,7 +174,7 @@ export class LooksRare {
       startTime,
       endTime,
       minPercentageToAsk,
-      params,
+      params: encodeOrderParams(params).encodedParams,
     };
 
     return {
@@ -181,6 +183,23 @@ export class LooksRare {
     };
   }
 
+  public createTaker(maker: MakerOrder, {
+      taker,
+      minPercentageToAsk = 0,
+      params = []
+    }: CreateTakerInput
+  ): TakerOrder {
+    const order: TakerOrder = {
+      isOrderAsk: !maker.isOrderAsk,
+      taker,
+      price: maker.price,
+      tokenId: maker.tokenId,
+      minPercentageToAsk: minPercentageToAsk,
+      params: encodeOrderParams(params).encodedParams
+    };
+    return order;
+  }
+  
   /**
    * Sign a maker order using the signer provided in the constructor
    * @param maker Order to be signed by the user
@@ -204,10 +223,9 @@ export class LooksRare {
   ): ContractMethods {
     const signer = this.getSigner();
     let execute;
-
-    if (maker.isOrderAsk && overrides?.value) {
+    if (maker.isOrderAsk && maker.currency === this.addresses.WETH) {
       execute = matchAskWithTakerBidUsingETHAndWETH
-    } else if (maker.isOrderAsk && !overrides?.value) {
+    } else if (maker.isOrderAsk && maker.currency !== this.addresses.WETH) {
       execute = matchAskWithTakerBid
     } else {
       execute = matchBidWithTakerAsk
@@ -220,7 +238,7 @@ export class LooksRare {
    * Cancell all maker bid and/or ask orders for the current user
    * @returns ContractMethods
    */
-  public cancelAllOrders(minNonce: BigNumberish, overrides?: Overrides): ContractMethods {
+  public cancelAllOrdersForSender(minNonce: BigNumberish, overrides?: Overrides): ContractMethods {
     const signer = this.getSigner();
 
     return cancelAllOrdersForSender(signer, this.addresses.EXCHANGE, minNonce, overrides);
@@ -231,7 +249,7 @@ export class LooksRare {
    * @param nonces List of nonces to be cancelled
    * @returns ContractMethods
    */
-  public cancelOrders(nonces: BigNumberish[], overrides?: Overrides): ContractMethods {
+  public cancelMultipleMakerOrders(nonces: BigNumberish[], overrides?: Overrides): ContractMethods {
     const signer = this.getSigner();
     return cancelMultipleMakerOrders(signer, this.addresses.EXCHANGE, nonces, overrides);
   }
@@ -269,4 +287,33 @@ export class LooksRare {
     const spenderAddress = this.addresses.EXCHANGE;
     return approve(signer, tokenAddress, spenderAddress, amount, overrides);
   }
+
+  public async verifyMakerOrder(
+    makerOrder: MakerOrder,
+    makerSignature: string,
+    overrides?: Overrides
+  ): Promise<OrderValidatorEnum[]> {
+    return verifyMakerOrder(
+      this.provider,
+      this.addresses.ORDER_VALIDATOR_V1,
+      makerOrder,
+      makerSignature,
+      overrides
+    );
+  }
+
+  public async verifyMakerOrders(
+    makerOrders: MakerOrder[],
+    signatures: string[],
+    overrides?: Overrides
+  ): Promise<OrderValidatorEnum[][]> {
+    return verifyMakerOrders(
+      this.provider,
+      this.addresses.ORDER_VALIDATOR_V1,
+      makerOrders,
+      signatures,
+      overrides
+    );
+  }
+  
 }

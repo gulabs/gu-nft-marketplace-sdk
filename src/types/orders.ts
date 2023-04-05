@@ -17,7 +17,7 @@ export interface MakerOrder {
   startTime: BigNumberish; // startTime in timestamp
   endTime: BigNumberish; // endTime in timestamp
   minPercentageToAsk: BigNumberish;
-  params: any[]; // params (e.g., price, target account for private sale)
+  params: BytesLike;
 }
 
 export interface MakerOrderWithEncodedParams extends Omit<MakerOrder, "params"> {
@@ -43,7 +43,7 @@ export interface TakerOrder {
   price: BigNumberish; // price for the purchase
   tokenId: BigNumberish;
   minPercentageToAsk: BigNumberish;
-  params: any[]; // params (e.g., price)
+  params: BytesLike;
 }
 
 export interface TakerOrderWithEncodedParams extends Omit<TakerOrder, "params"> {
@@ -60,8 +60,14 @@ export interface CreateMakerInput {
   nonce: BigNumberish; // order nonce (must be unique unless new maker order is meant to override existing one e.g., lower ask price)
   startTime?: BigNumberish; // startTime in timestamp
   endTime: BigNumberish; // endTime in timestamp
-  minPercentageToAsk: BigNumberish;
+  minPercentageToAsk?: BigNumberish;
   params?: any[]; // params (e.g., price, target account for private sale)
+}
+
+export interface CreateTakerInput { 
+  taker: string;
+  minPercentageToAsk?: BigNumberish;
+  params?: any[]
 }
 
 export interface CreateMakerAskOutput {

@@ -16,20 +16,29 @@ import type { TransferSelectorNFT } from "../../typechain/@looksrare/contracts-e
 import type { OrderValidatorV1 } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/orderValidation/OrderValidatorV1";
 import type { MockERC721 } from "../../typechain/src/contracts/mocks/MockERC721";
 import type { MockERC20 } from "../../typechain/src/contracts/mocks/MockERC20";
+import { Addresses } from "../../types";
+import chai from "chai";
+import chaiAsPromised from "chai-as-promised";
+
+chai.use(chaiAsPromised);
 
 export interface SetupMocks {
-  weth: WETH;
-  usdt: MockERC20;
-  currencyManager: CurrencyManager;
-  strategyStandardSaleForFixedPrice: StrategyStandardSaleForFixedPrice;
-  royaltyFeeManager: RoyaltyFeeManager;
-  royaltyFeeRegistry: RoyaltyFeeRegistry;
-  royaltyFeeSetter: RoyaltyFeeSetter;
-  looksRareExchange: LooksRareExchange;
-  transferManagerERC721: TransferManagerERC721;
-  transferManagerERC1155: TransferManagerERC1155;
-  transferSelectorNFT: TransferSelectorNFT
-  orderValidatorV1: OrderValidatorV1;
+  contracts: {
+    weth: WETH;
+    usdt: MockERC20;
+    currencyManager: CurrencyManager;
+    strategyStandardSaleForFixedPrice: StrategyStandardSaleForFixedPrice;
+    royaltyFeeManager: RoyaltyFeeManager;
+    royaltyFeeRegistry: RoyaltyFeeRegistry;
+    royaltyFeeSetter: RoyaltyFeeSetter;
+    looksRareExchange: LooksRareExchange;
+    transferManagerERC721: TransferManagerERC721;
+    transferManagerERC1155: TransferManagerERC1155;
+    transferSelectorNFT: TransferSelectorNFT
+    orderValidatorV1: OrderValidatorV1;
+    collectionERC721: MockERC721;
+  },
+  addresses: Addresses;
 }
 
 export interface Signers {
@@ -134,17 +143,51 @@ export const setUpContracts = async (): Promise<SetupMocks> => {
   }
 
   return {
-    weth,
-    usdt,
-    currencyManager,
-    strategyStandardSaleForFixedPrice,
-    royaltyFeeManager,
-    royaltyFeeRegistry,
-    royaltyFeeSetter,
-    looksRareExchange,
-    transferManagerERC721,
-    transferManagerERC1155,
-    transferSelectorNFT,
-    orderValidatorV1
+    contracts: {
+      weth,
+      usdt,
+      currencyManager,
+      strategyStandardSaleForFixedPrice,
+      royaltyFeeManager,
+      royaltyFeeRegistry,
+      royaltyFeeSetter,
+      looksRareExchange,
+      transferManagerERC721,
+      transferManagerERC1155,
+      transferSelectorNFT,
+      orderValidatorV1,
+      collectionERC721,
+    },
+    addresses: {
+      LOOKS: "",
+      LOOKS_LP: "",
+      LOOKS_LP_UNIV3: "",
+      WETH: weth.address,
+      ROYALTY_FEE_MANAGER: royaltyFeeManager.address,
+      ROYALTY_FEE_REGISTRY: royaltyFeeRegistry.address,
+      ROYALTY_FEE_SETTER: royaltyFeeSetter.address,
+      EXCHANGE: looksRareExchange.address,
+      TRANSFER_MANAGER_ERC721: transferManagerERC721.address,
+      TRANSFER_MANAGER_ERC1155: transferManagerERC1155.address,
+      TRANSFER_SELECTOR_NFT: transferSelectorNFT.address,
+      STRATEGY_STANDARD_SALE_DEPRECATED: strategyStandardSaleForFixedPrice.address,
+      STRATEGY_COLLECTION_SALE_DEPRECATED: "",
+      STRATEGY_STANDARD_SALE: "",
+      STRATEGY_COLLECTION_SALE: "",
+      STRATEGY_PRIVATE_SALE: "",
+      STRATEGY_DUTCH_AUCTION: "",
+      PRIVATE_SALE_WITH_FEE_SHARING: "",
+      FEE_SHARING_SYSTEM: "",
+      STAKING_POOL_FOR_LOOKS_LP: "",
+      TOKEN_DISTRIBUTOR: "",
+      TRADING_REWARDS_DISTRIBUTOR: "",
+      MULTI_REWARDS_DISTRIBUTOR: "",
+      MULTICALL2: "",
+      REVERSE_RECORDS: "",
+      AGGREGATOR_UNISWAP_V3: "",
+      EXECUTION_MANAGER: executionManager.address,
+      CURRENCY_MANAGER: currencyManager.address,
+      ORDER_VALIDATOR_V1: orderValidatorV1.address,
+    }
   }
 }
