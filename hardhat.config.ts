@@ -1,0 +1,54 @@
+import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-ethers";
+import "@typechain/hardhat";
+import "hardhat-abi-exporter";
+
+const config = {
+  defaultNetwork: "hardhat",
+  networks: {
+    hardhat: {
+      allowUnlimitedContractSize: true,
+    },
+  },
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.17",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+      {
+        version: "0.4.18",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+    ],
+  },
+  abiExporter: {
+    path: "./src/abis",
+    runOnCompile: true,
+    clear: true,
+    flat: true,
+    pretty: false,
+    only: ["LooksRareExchange", "CurrencyManager", "IExecutionStrategy", "ExecutionManager", "RoyaltyFeeManager", "RoyaltyFeeRegistry", "RoyaltyFeeSetter", "ITransferManagerNFT", "TransferSelectorNFT", "OrderValidatorV1", "IERC20", "IERC721", "IERC1155", "IWETH"],
+  },
+  typechain: {
+    outDir: "src/typechain",
+    target: "ethers-v5",
+  },
+  paths: {
+    tests: "src/__tests__",
+    artifacts: "src/artifacts",
+    sources: "src/contracts",
+  },
+};
+
+export default config;

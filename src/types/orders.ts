@@ -17,17 +17,9 @@ export interface MakerOrder {
   startTime: BigNumberish; // startTime in timestamp
   endTime: BigNumberish; // endTime in timestamp
   minPercentageToAsk: BigNumberish;
-  params: any[]; // params (e.g., price, target account for private sale)
-}
-
-export interface MakerOrderWithEncodedParams extends Omit<MakerOrder, "params"> {
   params: BytesLike;
 }
 
-/** MakerOrderWithSignature matches the type used for API order mutations and contract calls. */
-export interface MakerOrderWithSignature extends MakerOrder {
-  signature: string;
-}
 
 /** MakerOrderWithVRS match the type sent to the contract when executing a trade */
 export interface MakerOrderWithVRS extends Omit<MakerOrder, "params"> {
@@ -43,9 +35,35 @@ export interface TakerOrder {
   price: BigNumberish; // price for the purchase
   tokenId: BigNumberish;
   minPercentageToAsk: BigNumberish;
-  params: any[]; // params (e.g., price)
+  params: BytesLike;
 }
 
-export interface TakerOrderWithEncodedParams extends Omit<TakerOrder, "params"> {
-  params: BytesLike;
+export interface CreateMakerInput {
+  collection: string; // collection address
+  price: BigNumberish;
+  tokenId: BigNumberish; // id of the token
+  amount?: BigNumberish; // amount of tokens to sell/purchase (must be 1 for ERC721, 1+ for ERC1155)
+  strategy: string; // strategy for trade execution (e.g., DutchAuction, StandardSaleForFixedPrice)
+  currency?: string; // currency address
+  nonce: BigNumberish; // order nonce (must be unique unless new maker order is meant to override existing one e.g., lower ask price)
+  startTime?: BigNumberish; // startTime in timestamp
+  endTime: BigNumberish; // endTime in timestamp
+  minPercentageToAsk?: BigNumberish;
+  params?: any[]; // params (e.g., price, target account for private sale)
+}
+
+export interface CreateTakerInput { 
+  taker: string;
+  minPercentageToAsk?: BigNumberish;
+  params?: any[]
+}
+
+export interface CreateMakerAskOutput {
+  maker: MakerOrder;
+  isCollectionApproved: boolean;
+}
+
+export interface CreateMakerBidOutput {
+  maker: MakerOrder;
+  isCurrencyApproved: boolean;
 }
