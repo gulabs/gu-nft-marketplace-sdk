@@ -1,4 +1,6 @@
 export * from "./constants";
-export * from "./sign";
 export * from "./types";
-export * from "./multicall";
+export * from "./errors";
+
+export { LooksRare } from "./LooksRare"
+

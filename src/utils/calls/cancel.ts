@@ -1,6 +1,6 @@
 import { BigNumber, BigNumberish, CallOverrides, Contract, ethers, Overrides, providers } from "ethers";
 import { ContractMethods, Signer } from "../../types";
-import { LooksRareExchangeAbi } from "../../abis/ts/LooksRareExchange";
+import LooksRareExchangeAbi from "../../abis/LooksRareExchange.json";
 
 export const userMinOrderNonce = (
   signerOrProvider: providers.Provider | Signer,

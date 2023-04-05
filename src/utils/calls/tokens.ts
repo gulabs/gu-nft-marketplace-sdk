@@ -1,6 +1,6 @@
 import { BigNumber, CallOverrides, Contract, Overrides, providers } from "ethers";
-import { ERC721Abi } from "../../abis/ts/ERC721";
-import { ERC20Abi } from "../../abis/ts/ERC20";
+import IERC721 from "../../abis/IERC721.json";
+import IERC20 from "../../abis/IERC20.json";
 
 import { Signer } from "../../types";
 
@@ -11,7 +11,7 @@ export const isApprovedForAll = (
   operator: string,
   overrides?: CallOverrides
 ): Promise<boolean> => {
-  const contract = new Contract(collection, ERC721Abi, signerOrProvider);
+  const contract = new Contract(collection, IERC721, signerOrProvider);
   return contract.isApprovedForAll(account, operator, { ...overrides });
 };
 
@@ -22,7 +22,7 @@ export const allowance = (
   operator: string,
   overrides?: CallOverrides
 ): Promise<BigNumber> => {
-  const contract = new Contract(currency, ERC20Abi, signerOrProvider);
+  const contract = new Contract(currency, IERC20, signerOrProvider);
   return contract.allowance(account, operator, { ...overrides });
 };
 
@@ -33,7 +33,7 @@ export const setApprovalForAll = (
   approved: boolean,
   overrides?: Overrides
 ) => {
-  const contract = new Contract(collection, ERC721Abi, signer);
+  const contract = new Contract(collection, IERC721, signer);
   return contract.setApprovalForAll(operator, approved, { ...overrides });
 };
 
@@ -44,6 +44,6 @@ export const approve = (
   amount: BigNumber,
   overrides?: Overrides
 ) => {
-  const contract = new Contract(currency, ERC20Abi, signer);
+  const contract = new Contract(currency, IERC20, signer);
   return contract.approve(operator, amount, { ...overrides });
 };

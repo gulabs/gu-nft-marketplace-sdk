@@ -20,14 +20,6 @@ export interface MakerOrder {
   params: BytesLike;
 }
 
-export interface MakerOrderWithEncodedParams extends Omit<MakerOrder, "params"> {
-  params: BytesLike;
-}
-
-/** MakerOrderWithSignature matches the type used for API order mutations and contract calls. */
-export interface MakerOrderWithSignature extends MakerOrder {
-  signature: string;
-}
 
 /** MakerOrderWithVRS match the type sent to the contract when executing a trade */
 export interface MakerOrderWithVRS extends Omit<MakerOrder, "params"> {
@@ -43,10 +35,6 @@ export interface TakerOrder {
   price: BigNumberish; // price for the purchase
   tokenId: BigNumberish;
   minPercentageToAsk: BigNumberish;
-  params: BytesLike;
-}
-
-export interface TakerOrderWithEncodedParams extends Omit<TakerOrder, "params"> {
   params: BytesLike;
 }
 

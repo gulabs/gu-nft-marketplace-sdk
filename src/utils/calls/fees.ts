@@ -1,6 +1,6 @@
 import { BigNumber, CallOverrides, Contract, providers } from "ethers";
-import { IExecutionStrategyAbi } from "../../abis/ts/IExecutionStrategy";
-import { RoyaltyFeeManagerAbi } from "../../abis/ts/RoyaltyFeeManager";
+import IExecutionStrategyAbi from "../../abis/IExecutionStrategy.json";
+import RoyaltyFeeManagerAbi from "../../abis/RoyaltyFeeManager.json";
 
 import { Signer } from "../../types";
 

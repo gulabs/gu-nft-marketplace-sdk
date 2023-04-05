@@ -9,8 +9,8 @@ import { allowance, approve, isApprovedForAll, setApprovalForAll } from "./utils
 import { signMakerOrder } from "./utils/signMakerOrder";
 import { matchAskWithTakerBid, matchAskWithTakerBidUsingETHAndWETH, matchBidWithTakerAsk } from "./utils/calls/exchange";
 import { cancelAllOrdersForSender, cancelMultipleMakerOrders } from "./utils/calls/cancel";
-import { encodeOrderParams } from "./sign";
 import { verifyMakerOrder, verifyMakerOrders } from "./utils/calls/validator";
+import { encodeOrderParams } from "./utils/encodeOrderParams";
 
 /**
  * LooksRare

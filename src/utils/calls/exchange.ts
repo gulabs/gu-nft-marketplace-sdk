@@ -1,6 +1,6 @@
 import {  ethers, PayableOverrides } from "ethers";
-import { ContractMethods, MakerOrder, Signer, TakerOrder } from "../../types";
-import { LooksRareExchangeAbi } from "../../abis/ts/LooksRareExchange";
+import { ContractMethods, MakerOrder, MakerOrderWithVRS, Signer, TakerOrder } from "../../types";
+import LooksRareExchangeAbi from "../../abis/LooksRareExchange.json";
 
 export const matchAskWithTakerBidUsingETHAndWETH = (
   signer: Signer,
@@ -13,7 +13,7 @@ export const matchAskWithTakerBidUsingETHAndWETH = (
   const contract = new ethers.Contract(exchange, LooksRareExchangeAbi, signer);
   const { v, r, s } = ethers.utils.splitSignature(makerSignature);
   
-  const makerAskAndSignature = { ...makerAsk, r, v, s };
+  const makerAskAndSignature: MakerOrderWithVRS = { ...makerAsk, r, v, s };
 
   return {
     call: (additionalOverrides?: PayableOverrides) =>
@@ -45,7 +45,7 @@ export const matchAskWithTakerBid = (
   const contract = new ethers.Contract(exchange, LooksRareExchangeAbi, signer);
   const { v, r, s } = ethers.utils.splitSignature(makerSignature);
   
-  const makerAskAndSignature = { ...makerAsk, r, v, s };
+  const makerAskAndSignature: MakerOrderWithVRS = { ...makerAsk, r, v, s };
 
   return {
     call: (additionalOverrides?: PayableOverrides) =>
@@ -77,7 +77,7 @@ export const matchBidWithTakerAsk = (
   const contract = new ethers.Contract(exchange, LooksRareExchangeAbi, signer);
   const { v, r, s } = ethers.utils.splitSignature(makerSignature);
   
-  const makerAskAndSignature = { ...makerBid, r, v, s };
+  const makerAskAndSignature: MakerOrderWithVRS = { ...makerBid, r, v, s };
 
   return {
     call: (additionalOverrides?: PayableOverrides) =>

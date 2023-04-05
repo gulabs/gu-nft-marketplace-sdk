@@ -1,7 +1,7 @@
 import { Contract, ethers, Overrides, providers } from "ethers";
 import { OrderValidatorV1 } from "../../typechain";
 import { Signer, OrderValidatorEnum, MakerOrder } from "../../types";
-import { OrderValidatorV1Abi } from "../../abis/ts/OrderValidatorV1";
+import OrderValidatorV1Abi from "../../abis/OrderValidatorV1.json";
 
 export const verifyMakerOrder = async (
   signerOrProvider: providers.Provider | Signer,

@@ -7,11 +7,12 @@ export { SupportedChainId, OrderValidatorEnum, OrderValidatorStatus } from "./en
 export type { ChainInfo, Addresses } from "./constants";
 export type {
   MakerOrder,
-  MakerOrderWithEncodedParams,
-  MakerOrderWithSignature,
+  CreateMakerInput,
+  CreateTakerInput,
+  CreateMakerAskOutput,
+  CreateMakerBidOutput,
   MakerOrderWithVRS,
   TakerOrder,
-  TakerOrderWithEncodedParams,
 } from "./orders";
 
 /**

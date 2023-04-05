@@ -22,17 +22,17 @@
     "url": "https://github.com/LooksRare/looksrare-sdk.git"
   },
   "scripts": {
-    "prebuild": "rm -rf ./dist",
+    "prebuild": "rm -rf ./src/typechain ./src/artifacts cache dist",
     "prepublishOnly": "yarn build",
-    "build": "rollup -c && tsc -d",
     "dev": "rollup -c -w",
+    "build:ts": "rollup -c && tsc -d",
+    "build:sc": "hardhat compile",
+    "build": "yarn build:sc && yarn build:ts",
+    "test": "hardhat test",
     "lint": "eslint --max-warnings 0 'src/**/*.{js,jsx,ts,tsx}'",
-    "test:watch": "jest --watch",
     "format:check": "prettier --check 'src/**/*.{js,jsx,ts,tsx,json,yaml,yml,md}'",
     "format:write": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,yaml,yml,md}'",
     "release": "release-it --only-version --set-upstream",
-    "build:sc": "hardhat compile",
-    "test": "hardhat test"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,yaml,yml}": "yarn format:write"
