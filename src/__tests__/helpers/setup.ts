@@ -14,6 +14,7 @@ import type { TransferManagerERC721 } from "../../typechain/@looksrare/contracts
 import type { TransferManagerERC1155 } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/transferManagers/TransferManagerERC1155";
 import type { TransferSelectorNFT } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/TransferSelectorNFT";
 import type { OrderValidatorV1 } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/orderValidation/OrderValidatorV1";
+import type { StrategyAnyItemFromCollectionForFixedPrice } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/executionStrategies/StrategyAnyItemFromCollectionForFixedPrice";
 import type { MockERC721 } from "../../typechain/src/contracts/mocks/MockERC721";
 import type { MockERC20 } from "../../typechain/src/contracts/mocks/MockERC20";
 import { Addresses } from "../../types";
@@ -28,6 +29,7 @@ export interface SetupMocks {
     usdt: MockERC20;
     currencyManager: CurrencyManager;
     strategyStandardSaleForFixedPrice: StrategyStandardSaleForFixedPrice;
+    strategyAnyItemFromCollectionForFixedPrice: StrategyAnyItemFromCollectionForFixedPrice
     royaltyFeeManager: RoyaltyFeeManager;
     royaltyFeeRegistry: RoyaltyFeeRegistry;
     royaltyFeeSetter: RoyaltyFeeSetter;
@@ -87,10 +89,14 @@ export const setUpContracts = async (): Promise<SetupMocks> => {
 
   // deploy strategy manager
   const strategyStandardSaleForFixedPrice = (await deploy("StrategyStandardSaleForFixedPrice", 200)) as StrategyStandardSaleForFixedPrice;
+  const strategyAnyItemFromCollectionForFixedPrice = (await deploy("StrategyAnyItemFromCollectionForFixedPrice", 200)) as StrategyAnyItemFromCollectionForFixedPrice;
+
   const executionManager = (await deploy("ExecutionManager")) as ExecutionManager;
   tx = await executionManager.addStrategy(strategyStandardSaleForFixedPrice.address);
   await tx.wait()
-
+  tx = await executionManager.addStrategy(strategyAnyItemFromCollectionForFixedPrice.address);
+  await tx.wait()
+  
   // deploy royalty fee manager
   const royaltyFeeRegistry = (await deploy("RoyaltyFeeRegistry", 200)) as RoyaltyFeeRegistry;
   const royaltyFeeSetter = (await deploy("RoyaltyFeeSetter", royaltyFeeRegistry.address)) as RoyaltyFeeSetter;
@@ -148,6 +154,7 @@ export const setUpContracts = async (): Promise<SetupMocks> => {
       usdt,
       currencyManager,
       strategyStandardSaleForFixedPrice,
+      strategyAnyItemFromCollectionForFixedPrice,
       royaltyFeeManager,
       royaltyFeeRegistry,
       royaltyFeeSetter,
@@ -171,7 +178,7 @@ export const setUpContracts = async (): Promise<SetupMocks> => {
       TRANSFER_MANAGER_ERC1155: transferManagerERC1155.address,
       TRANSFER_SELECTOR_NFT: transferSelectorNFT.address,
       STRATEGY_STANDARD_SALE_DEPRECATED: strategyStandardSaleForFixedPrice.address,
-      STRATEGY_COLLECTION_SALE_DEPRECATED: "",
+      STRATEGY_COLLECTION_SALE_DEPRECATED: strategyAnyItemFromCollectionForFixedPrice.address,
       STRATEGY_STANDARD_SALE: "",
       STRATEGY_COLLECTION_SALE: "",
       STRATEGY_PRIVATE_SALE: "",

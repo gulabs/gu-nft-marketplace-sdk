@@ -5,7 +5,7 @@ import { getSigners, setUpContracts, SetupMocks, Signers } from "./helpers/setup
 import { LooksRare } from "../LooksRare"
 import { OrderValidatorEnum, SupportedChainId } from "../types"
 import { ErrorSigner, ErrorTimestamp } from "../errors";
-import { CreateMakerInput, MakerOrder, TakerOrder } from "../types/orders";
+import { CreateMakerCollectionOfferInput, CreateMakerInput, MakerOrder, TakerOrder } from "../types/orders";
 import { BigNumber, constants, utils } from "ethers";
 import { allowance, isApprovedForAll } from "../utils/calls/tokens";
 import { TypedDataDomain } from "@ethersproject/abstract-signer";
@@ -716,4 +716,133 @@ describe("LooksRare", () => {
       expect(orders[0].every((code) => code === OrderValidatorEnum.ORDER_EXPECTED_TO_BE_VALID)).to.be.true;
     });
   })
+
+  describe("createMakerCollectionOffer", () => {
+    let baseMakerCollectionInput: CreateMakerCollectionOfferInput;
+
+    beforeEach(async () => {
+      baseMakerCollectionInput = {
+        collection: mocks.contracts.collectionERC721.address,
+        price: utils.parseEther("1"),
+        nonce: 0,
+        endTime: Math.floor(Date.now() / 1000) + 3600,
+        minPercentageToAsk: 0,
+      }
+    });
+
+    it("create maker collection offer with wrong time format", async () => {
+      const looksrare = new LooksRare(SupportedChainId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      await expect(looksrare.createMakerCollectionOffer({ ...baseMakerCollectionInput, startTime: Date.now() })).to.eventually.be.rejectedWith(
+        ErrorTimestamp
+      );
+      await expect(looksrare.createMakerCollectionOffer({ ...baseMakerCollectionInput, endTime: Date.now() })).to.eventually.be.rejectedWith(
+        ErrorTimestamp
+      );
+    });
+
+    it("approvals checks are false if no approval was made", async () => {
+      const looksrare = new LooksRare(SupportedChainId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const { isCurrencyApproved } = await looksrare.createMakerCollectionOffer(baseMakerCollectionInput);
+  
+      expect(isCurrencyApproved).to.be.false;
+  
+      await looksrare.approveErc20(looksrare.addresses.WETH);
+      const valueApproved = await allowance(
+        ethers.provider,
+        mocks.addresses.WETH,
+        signers.user1.address,
+        mocks.addresses.EXCHANGE
+      );
+      expect(valueApproved.eq(constants.MaxUint256)).to.be.true;
+    });
+
+    it("approval checks are true if approval were made", async () => {
+      const looksrare = new LooksRare(SupportedChainId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const tx = await looksrare.approveErc20(looksrare.addresses.WETH);
+      await tx.wait();
+      const { isCurrencyApproved } = await looksrare.createMakerCollectionOffer(baseMakerCollectionInput);
+      expect(isCurrencyApproved).to.be.true;
+    });
+
+    it("create a simple maker collection offer with default values", async () => {
+      const looksrare = new LooksRare(SupportedChainId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const output = await looksrare.createMakerCollectionOffer(baseMakerCollectionInput);
+      const makerOrder: MakerOrder = {
+        isOrderAsk: false,
+        signer: signers.user1.address,
+        collection: mocks.contracts.collectionERC721.address,
+        price: utils.parseEther("1"),
+        tokenId: constants.Zero,
+        amount: 1,
+        strategy: mocks.contracts.strategyAnyItemFromCollectionForFixedPrice.address,
+        currency: mocks.contracts.weth.address,
+        nonce: 0,
+        startTime: Math.floor(Date.now() / 1000),
+        endTime: Math.floor(Date.now() / 1000) + 3600,
+        minPercentageToAsk: 0,
+        params: "0x"
+      };
+      expect(output.maker).to.eql(makerOrder);
+    });
+
+    it("create a simple maker collection offer with non default values", async () => {
+      const looksrare = new LooksRare(SupportedChainId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const input = {
+        ...baseMakerCollectionInput,
+        amount: 2,
+        currency: mocks.contracts.usdt.address,
+        startTime: Math.floor(Date.now() / 1000),
+        taker: signers.user2.address,
+        params: [],
+      };
+      const output = await looksrare.createMakerCollectionOffer(input);
+      const makerOrder: MakerOrder = {
+        isOrderAsk: false,
+        signer: signers.user1.address,
+        collection: mocks.contracts.collectionERC721.address,
+        price: utils.parseEther("1"),
+        tokenId: constants.Zero,
+        amount: 2,
+        strategy: mocks.contracts.strategyAnyItemFromCollectionForFixedPrice.address,
+        currency: mocks.contracts.usdt.address,
+        nonce: 0,
+        startTime: Math.floor(Date.now() / 1000),
+        endTime: Math.floor(Date.now() / 1000) + 3600,
+        minPercentageToAsk: 0,
+        params: "0x"
+      };
+      expect(output.maker).to.eql(makerOrder);
+    });
+  });
+
+  describe("createTakerCollectionOffer", () => {
+    let baseMakerCollectionInput: CreateMakerCollectionOfferInput;
+
+    beforeEach(async () => {
+      baseMakerCollectionInput = {
+        collection: mocks.contracts.collectionERC721.address,
+        price: utils.parseEther("1"),
+        nonce: 0,
+        endTime: Math.floor(Date.now() / 1000) + 3600,
+        minPercentageToAsk: 0,
+      }
+    });
+
+    it("create taker collection offer with recipient", async () => {
+      const looksrare = new LooksRare(SupportedChainId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const { maker } = await looksrare.createMakerCollectionOffer(baseMakerCollectionInput);
+      const taker = looksrare.createTakerCollectionOffer(maker, 1, { taker: signers.user2.address });
+
+      const takerOrder: TakerOrder = {
+        isOrderAsk: true,
+        taker: signers.user2.address,
+        price: utils.parseEther("1"),
+        tokenId: 1,
+        minPercentageToAsk: 0,
+        params: "0x"
+      }
+      expect(taker).to.eql(takerOrder)
+    });
+    
+  });
 })

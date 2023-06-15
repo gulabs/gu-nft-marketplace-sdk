@@ -1,10 +1,10 @@
-import { BigNumber, BigNumberish, ContractTransaction, ethers, Overrides, PayableOverrides, providers } from "ethers";
+import { BigNumber, BigNumberish, constants, ContractTransaction, ethers, Overrides, PayableOverrides, providers } from "ethers";
 import { addressesByNetwork, contractName, version } from "./constants";
 import { Addresses, ContractMethods, MakerOrder, OrderValidatorEnum, Signer, SupportedChainId } from "./types";
 import * as multicall from "@0xsequence/multicall";
 import { ErrorSigner, ErrorTimestamp } from "./errors";
 import { TypedDataDomain } from "@ethersproject/abstract-signer";
-import { CreateMakerAskOutput, CreateMakerBidOutput, CreateMakerInput, CreateTakerInput, TakerOrder } from "./types/orders";
+import { CreateMakerAskOutput, CreateMakerBidOutput, CreateMakerCollectionOfferInput, CreateMakerInput, CreateTakerInput, TakerOrder } from "./types/orders";
 import { allowance, approve, isApprovedForAll, setApprovalForAll } from "./utils/calls/tokens";
 import { signMakerOrder } from "./utils/signMakerOrder";
 import { matchAskWithTakerBid, matchAskWithTakerBidUsingETHAndWETH, matchBidWithTakerAsk } from "./utils/calls/exchange";
@@ -91,7 +91,7 @@ export class LooksRare {
     price,
     tokenId,
     amount = 1,
-    strategy,
+    strategy = this.addresses.STRATEGY_STANDARD_SALE_DEPRECATED,
     currency = this.addresses.WETH,
     nonce,
     startTime = Math.floor(Date.now() / 1000),
@@ -142,7 +142,7 @@ export class LooksRare {
     price,
     tokenId,
     amount = 1,
-    strategy,
+    strategy = this.addresses.STRATEGY_STANDARD_SALE_DEPRECATED,
     currency = this.addresses.WETH,
     nonce,
     startTime = Math.floor(Date.now() / 1000),
@@ -183,21 +183,29 @@ export class LooksRare {
     };
   }
 
-  public createTaker(maker: MakerOrder, {
-      taker,
-      minPercentageToAsk = 0,
-      params = []
-    }: CreateTakerInput
+  public createMakerCollectionOffer(orderInputs: CreateMakerCollectionOfferInput): Promise<CreateMakerBidOutput> {
+    return this.createMakerBid({
+      ...orderInputs,
+      strategy: orderInputs.strategy || this.addresses.STRATEGY_COLLECTION_SALE_DEPRECATED,
+      tokenId: constants.Zero
+    });
+  }
+
+  public createTaker(maker: MakerOrder, takerInput: CreateTakerInput
   ): TakerOrder {
     const order: TakerOrder = {
       isOrderAsk: !maker.isOrderAsk,
-      taker,
+      taker: takerInput.taker,
       price: maker.price,
       tokenId: maker.tokenId,
-      minPercentageToAsk: minPercentageToAsk,
-      params: encodeOrderParams(params).encodedParams
+      minPercentageToAsk: takerInput.minPercentageToAsk || 0,
+      params: encodeOrderParams(takerInput.params).encodedParams
     };
     return order;
+  }
+
+  public createTakerCollectionOffer(maker: MakerOrder, tokenId: BigNumberish, takerInput: CreateTakerInput): TakerOrder {
+    return this.createTaker({...maker, tokenId }, takerInput);
   }
   
   /**

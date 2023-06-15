@@ -43,7 +43,20 @@ export interface CreateMakerInput {
   price: BigNumberish;
   tokenId: BigNumberish; // id of the token
   amount?: BigNumberish; // amount of tokens to sell/purchase (must be 1 for ERC721, 1+ for ERC1155)
-  strategy: string; // strategy for trade execution (e.g., DutchAuction, StandardSaleForFixedPrice)
+  strategy?: string; // strategy for trade execution (e.g., DutchAuction, StandardSaleForFixedPrice)
+  currency?: string; // currency address
+  nonce: BigNumberish; // order nonce (must be unique unless new maker order is meant to override existing one e.g., lower ask price)
+  startTime?: BigNumberish; // startTime in timestamp
+  endTime: BigNumberish; // endTime in timestamp
+  minPercentageToAsk?: BigNumberish;
+  params?: any[]; // params (e.g., price, target account for private sale)
+}
+
+export interface CreateMakerCollectionOfferInput {
+  collection: string; // collection address
+  price: BigNumberish;
+  amount?: BigNumberish; // amount of tokens to sell/purchase (must be 1 for ERC721, 1+ for ERC1155)
+  strategy?: string; // strategy for trade execution (e.g., DutchAuction, StandardSaleForFixedPrice)
   currency?: string; // currency address
   nonce: BigNumberish; // order nonce (must be unique unless new maker order is meant to override existing one e.g., lower ask price)
   startTime?: BigNumberish; // startTime in timestamp
