@@ -191,8 +191,7 @@ export class LooksRare {
     });
   }
 
-  public createTaker(maker: MakerOrder, takerInput: CreateTakerInput
-  ): TakerOrder {
+  public createTaker(maker: MakerOrder, takerInput: CreateTakerInput): TakerOrder {
     const order: TakerOrder = {
       isOrderAsk: !maker.isOrderAsk,
       taker: takerInput.taker,
@@ -202,10 +201,6 @@ export class LooksRare {
       params: encodeOrderParams(takerInput.params).encodedParams
     };
     return order;
-  }
-
-  public createTakerCollectionOffer(maker: MakerOrder, tokenId: BigNumberish, takerInput: CreateTakerInput): TakerOrder {
-    return this.createTaker({...maker, tokenId }, takerInput);
   }
   
   /**

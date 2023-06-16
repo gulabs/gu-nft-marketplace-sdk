@@ -522,6 +522,41 @@ describe("LooksRare", () => {
       const receipt = await tx.wait();
       expect(receipt.status).to.be.equal(1);
     })
+
+    it.only("execute collection offer maker bid and taker ask using ERC20", async () => {
+      const lrUser1 = new LooksRare(SupportedChainId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const lrUser2 = new LooksRare(SupportedChainId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
+      
+      const { maker } = await lrUser2.createMakerCollectionOffer({
+        collection: mocks.contracts.collectionERC721.address,
+        price: utils.parseEther("1"),
+        nonce: 0,
+        endTime: Math.floor(Date.now() / 1000) + 3600,
+        minPercentageToAsk: 0,
+        currency: mocks.contracts.usdt.address,
+        strategy: mocks.contracts.strategyAnyItemFromCollectionForFixedPrice.address
+      })
+      const signature = await lrUser2.signMakerOrder(maker);
+
+      const taker = lrUser1.createTaker({...maker, tokenId: 2}, { taker: signers.user1.address })
+      let tx = await lrUser1.approveAllCollectionItems(maker.collection);
+      await tx.wait();
+
+      tx = await lrUser2.approveErc20(mocks.contracts.usdt.address);
+      await tx.wait();
+
+      const contractMethods = lrUser1.executeOrder(maker, taker, signature);
+      
+      const estimatedGas = await contractMethods.estimateGas();
+      expect(estimatedGas.toNumber()).to.be.greaterThan(0);
+
+      await expect(contractMethods.callStatic()).to.eventually.be.fulfilled;
+
+      tx = await contractMethods.call();
+      const receipt = await tx.wait();
+      expect(receipt.status).to.be.equal(1);
+
+    })
   })
 
   describe("cancelAllOrdersForSender", () => {
