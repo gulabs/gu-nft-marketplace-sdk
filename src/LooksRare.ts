@@ -203,6 +203,9 @@ export class LooksRare {
     return order;
   }
   
+  public createTakerCollectionOffer(maker: MakerOrder, tokenId: BigNumberish, takerInput: CreateTakerInput) {
+    return this.createTaker({...maker, tokenId }, takerInput)
+  }
   /**
    * Sign a maker order using the signer provided in the constructor
    * @param maker Order to be signed by the user
