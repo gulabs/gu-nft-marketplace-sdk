@@ -38,7 +38,7 @@ const config = {
     clear: true,
     flat: true,
     pretty: false,
-    only: ["LooksRareExchange", "CurrencyManager", "IExecutionStrategy", "ExecutionManager", "RoyaltyFeeManager", "RoyaltyFeeRegistry", "RoyaltyFeeSetter", "ITransferManagerNFT", "TransferSelectorNFT", "OrderValidatorV1", "IERC20", "IERC721", "IERC1155", "IWETH"],
+    only: ["GUNftMarketplaceExchange", "CurrencyManager", "IExecutionStrategy", "ExecutionManager", "RoyaltyFeeManager", "RoyaltyFeeRegistry", "RoyaltyFeeSetter", "ITransferManagerNFT", "TransferSelectorNFT", "OrderValidatorV1", "IERC20", "IERC721", "IERC1155", "IWETH"],
   },
   typechain: {
     outDir: "src/typechain",

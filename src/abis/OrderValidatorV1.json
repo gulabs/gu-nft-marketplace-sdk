@@ -3,7 +3,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_looksRareExchange",
+        "name": "_exchange",
         "type": "address"
       }
     ],
@@ -1038,10 +1038,10 @@
   },
   {
     "inputs": [],
-    "name": "executionManager",
+    "name": "exchange",
     "outputs": [
       {
-        "internalType": "contract IExecutionManager",
+        "internalType": "contract GUNftMarketplaceExchange",
         "name": "",
         "type": "address"
       }
@@ -1051,10 +1051,10 @@
   },
   {
     "inputs": [],
-    "name": "looksRareExchange",
+    "name": "executionManager",
     "outputs": [
       {
-        "internalType": "contract LooksRareExchange",
+        "internalType": "contract IExecutionManager",
         "name": "",
         "type": "address"
       }

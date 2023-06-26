@@ -3,4 +3,4 @@ export * from "./types";
 export * from "./errors";
 export * from "./utils";
 
-export { LooksRare } from "./LooksRare"
+export { GUNftMarketplaceSdk } from "./GUNftMarketplaceSdk"

@@ -1,8 +1,6 @@
-# @looksrare/sdk
+# @gu-nft-marketplace/sdk
 
-![GitHub package.json version](https://img.shields.io/github/package-json/v/LooksRare/looksrare-sdk) ![GitHub](https://img.shields.io/github/license/LooksRare/looksrare-sdk) ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/LooksRare/looksrare-sdk/build.yml?branch=master)
-
-This SDK is a collection of tools used to interact with the LooksRare API and smart contracts.
+This SDK is a collection of tools used to interact with the Exchange API and smart contracts.
 
 ## Usage
 
@@ -13,13 +11,13 @@ This package has a peer dependency on [etherjs](https://docs.ethers.io/v5/).
 Install with
 
 ```bash
-yarn add @looksrare/sdk ethers
+yarn add @gu-nft-marketplace/sdk ethers
 ```
 
 or
 
 ```bash
-npm install @looksrare/sdk ethers --save
+npm install@gu-nft-marketplace/sdk ethers --save
 ```
 
 ### Documentation

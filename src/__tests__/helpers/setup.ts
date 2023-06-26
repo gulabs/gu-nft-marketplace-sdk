@@ -3,18 +3,18 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { Contract, ContractTransaction } from "ethers";
 import { ethers } from "hardhat";
 import type { WETH } from "../../typechain/solmate/src/tokens/WETH";
-import type { LooksRareExchange } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/LooksRareExchange";
-import type { CurrencyManager } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/CurrencyManager"; 
-import type { ExecutionManager } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/ExecutionManager";
-import type { StrategyStandardSaleForFixedPrice } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/executionStrategies/StrategyStandardSaleForFixedPrice";
-import type { RoyaltyFeeManager } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/RoyaltyFeeManager";
-import type { RoyaltyFeeRegistry } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/royaltyFeeHelpers/RoyaltyFeeRegistry";
-import type { RoyaltyFeeSetter } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/royaltyFeeHelpers/RoyaltyFeeSetter";
-import type { TransferManagerERC721 } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/transferManagers/TransferManagerERC721";
-import type { TransferManagerERC1155 } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/transferManagers/TransferManagerERC1155";
-import type { TransferSelectorNFT } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/TransferSelectorNFT";
-import type { OrderValidatorV1 } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/orderValidation/OrderValidatorV1";
-import type { StrategyAnyItemFromCollectionForFixedPrice } from "../../typechain/@looksrare/contracts-exchange-v1/contracts/executionStrategies/StrategyAnyItemFromCollectionForFixedPrice";
+import type { GUNftMarketplaceExchange } from "../../typechain/@gu-nft-marketplace/contracts/contracts/GUNftMarketplaceExchange";
+import type { CurrencyManager } from "../../typechain/@gu-nft-marketplace/contracts/contracts/CurrencyManager"; 
+import type { ExecutionManager } from "../../typechain/@gu-nft-marketplace/contracts/contracts/ExecutionManager";
+import type { StrategyStandardSaleForFixedPrice } from "../../typechain/@gu-nft-marketplace/contracts/contracts/executionStrategies/StrategyStandardSaleForFixedPrice";
+import type { RoyaltyFeeManager } from "../../typechain/@gu-nft-marketplace/contracts/contracts/RoyaltyFeeManager";
+import type { RoyaltyFeeRegistry } from "../../typechain/@gu-nft-marketplace/contracts/contracts/royaltyFeeHelpers/RoyaltyFeeRegistry";
+import type { RoyaltyFeeSetter } from "../../typechain/@gu-nft-marketplace/contracts/contracts/royaltyFeeHelpers/RoyaltyFeeSetter";
+import type { TransferManagerERC721 } from "../../typechain/@gu-nft-marketplace/contracts/contracts/transferManagers/TransferManagerERC721";
+import type { TransferManagerERC1155 } from "../../typechain/@gu-nft-marketplace/contracts/contracts/transferManagers/TransferManagerERC1155";
+import type { TransferSelectorNFT } from "../../typechain/@gu-nft-marketplace/contracts/contracts/TransferSelectorNFT";
+import type { OrderValidatorV1 } from "../../typechain/@gu-nft-marketplace/contracts/contracts/orderValidation/OrderValidatorV1";
+import type { StrategyAnyItemFromCollectionForFixedPrice } from "../../typechain/@gu-nft-marketplace/contracts/contracts/executionStrategies/StrategyAnyItemFromCollectionForFixedPrice";
 import type { MockERC721 } from "../../typechain/src/contracts/mocks/MockERC721";
 import type { MockERC20 } from "../../typechain/src/contracts/mocks/MockERC20";
 import { Addresses } from "../../types";
@@ -33,7 +33,7 @@ export interface SetupMocks {
     royaltyFeeManager: RoyaltyFeeManager;
     royaltyFeeRegistry: RoyaltyFeeRegistry;
     royaltyFeeSetter: RoyaltyFeeSetter;
-    looksRareExchange: LooksRareExchange;
+    exchange: GUNftMarketplaceExchange;
     transferManagerERC721: TransferManagerERC721;
     transferManagerERC1155: TransferManagerERC1155;
     transferSelectorNFT: TransferSelectorNFT
@@ -104,26 +104,26 @@ export const setUpContracts = async (): Promise<SetupMocks> => {
   tx = await royaltyFeeRegistry.transferOwnership(royaltyFeeSetter.address);
   await tx.wait()
 
-  // deploy looksRareExchange
-  const looksRareExchange = (await deploy(
-    "LooksRareExchange",
+  // deploy exchange
+  const exchange = (await deploy(
+    "GUNftMarketplaceExchange",
     currencyManager.address,
     executionManager.address,
     royaltyFeeManager.address,
     weth.address,
     signers.protocolFeeRecipient.address
-  )) as LooksRareExchange;
+  )) as GUNftMarketplaceExchange;
 
   // deploy transfer selector
-  const transferManagerERC721 = (await deploy("TransferManagerERC721", looksRareExchange.address)) as TransferManagerERC721;
-  const transferManagerERC1155 = (await deploy("TransferManagerERC1155", looksRareExchange.address)) as TransferManagerERC1155;
+  const transferManagerERC721 = (await deploy("TransferManagerERC721", exchange.address)) as TransferManagerERC721;
+  const transferManagerERC1155 = (await deploy("TransferManagerERC1155", exchange.address)) as TransferManagerERC1155;
   const transferSelectorNFT = (await deploy("TransferSelectorNFT", transferManagerERC721.address, transferManagerERC1155.address)) as TransferSelectorNFT;
 
-  tx = await looksRareExchange.updateTransferSelectorNFT(transferSelectorNFT.address);
+  tx = await exchange.updateTransferSelectorNFT(transferSelectorNFT.address);
   await tx.wait()
 
   // deploy order validator
-  const orderValidatorV1 = (await deploy("OrderValidatorV1", looksRareExchange.address)) as OrderValidatorV1;
+  const orderValidatorV1 = (await deploy("OrderValidatorV1", exchange.address)) as OrderValidatorV1;
   const collectionERC721 = (await deploy("MockERC721", "collectionERC721", "COL1")) as MockERC721;
 
   // setup balances
@@ -158,7 +158,7 @@ export const setUpContracts = async (): Promise<SetupMocks> => {
       royaltyFeeManager,
       royaltyFeeRegistry,
       royaltyFeeSetter,
-      looksRareExchange,
+      exchange,
       transferManagerERC721,
       transferManagerERC1155,
       transferSelectorNFT,
@@ -166,14 +166,11 @@ export const setUpContracts = async (): Promise<SetupMocks> => {
       collectionERC721,
     },
     addresses: {
-      LOOKS: "",
-      LOOKS_LP: "",
-      LOOKS_LP_UNIV3: "",
       WETH: weth.address,
       ROYALTY_FEE_MANAGER: royaltyFeeManager.address,
       ROYALTY_FEE_REGISTRY: royaltyFeeRegistry.address,
       ROYALTY_FEE_SETTER: royaltyFeeSetter.address,
-      EXCHANGE: looksRareExchange.address,
+      EXCHANGE: exchange.address,
       TRANSFER_MANAGER_ERC721: transferManagerERC721.address,
       TRANSFER_MANAGER_ERC1155: transferManagerERC1155.address,
       TRANSFER_SELECTOR_NFT: transferSelectorNFT.address,
@@ -183,15 +180,6 @@ export const setUpContracts = async (): Promise<SetupMocks> => {
       STRATEGY_COLLECTION_SALE: "",
       STRATEGY_PRIVATE_SALE: "",
       STRATEGY_DUTCH_AUCTION: "",
-      PRIVATE_SALE_WITH_FEE_SHARING: "",
-      FEE_SHARING_SYSTEM: "",
-      STAKING_POOL_FOR_LOOKS_LP: "",
-      TOKEN_DISTRIBUTOR: "",
-      TRADING_REWARDS_DISTRIBUTOR: "",
-      MULTI_REWARDS_DISTRIBUTOR: "",
-      MULTICALL2: "",
-      REVERSE_RECORDS: "",
-      AGGREGATOR_UNISWAP_V3: "",
       EXECUTION_MANAGER: executionManager.address,
       CURRENCY_MANAGER: currencyManager.address,
       ORDER_VALIDATOR_V1: orderValidatorV1.address,

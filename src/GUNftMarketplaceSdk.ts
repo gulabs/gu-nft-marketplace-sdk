@@ -1,6 +1,6 @@
 import { BigNumber, BigNumberish, constants, ContractTransaction, ethers, Overrides, PayableOverrides, providers } from "ethers";
 import { addressesByNetwork, contractName, version } from "./constants";
-import { Addresses, ContractMethods, MakerOrder, OrderValidatorEnum, Signer, SupportedChainId } from "./types";
+import { Addresses, ContractMethods, MakerOrder, OrderValidatorEnum, Signer, SupportedNetworkId } from "./types";
 import * as multicall from "@0xsequence/multicall";
 import { ErrorSigner, ErrorTimestamp } from "./errors";
 import { TypedDataDomain } from "@ethersproject/abstract-signer";
@@ -11,15 +11,18 @@ import { matchAskWithTakerBid, matchAskWithTakerBidUsingETHAndWETH, matchBidWith
 import { cancelAllOrdersForSender, cancelMultipleMakerOrders } from "./utils/calls/cancel";
 import { verifyMakerOrder, verifyMakerOrders } from "./utils/calls/validator";
 import { encodeOrderParams } from "./utils/encodeOrderParams";
+import { SupportedChainId } from "./types/enum";
 
 /**
- * LooksRare
- * This class provides helpers to interact with the LooksRare V1 contracts
+ * GUNftMarketplaceSdk
+ * This class provides helpers to interact with the GUNftMarketplace contracts
  */
-export class LooksRare {
+export class GUNftMarketplaceSdk {
   /** Current app chain ID */
   public readonly chainId: SupportedChainId;
-  /** Mapping of LooksRare protocol addresses for the current chain */
+
+  public readonly networkId: SupportedNetworkId;
+  /** Mapping of GUNftMarketplace protocol addresses for the current chain */
   public readonly addresses: Addresses;
 
   /**
@@ -36,15 +39,16 @@ export class LooksRare {
   public readonly provider: providers.Provider;
 
   /**
-  * LooksRare protocol main class
+  * GUNftMarketplaceSdk protocol main class
   * @param chainId Current app chain id
   * @param provider Ethers provider
   * @param signer Ethers signer
   * @param override Overrides contract addresses for hardhat setup
   */
-  constructor(chainId: SupportedChainId, provider: providers.Provider, signer?: Signer, override?: Addresses) {
+  constructor(chainId: SupportedChainId, networkId: SupportedNetworkId, provider: providers.Provider, signer?: Signer, override?: Addresses) {
     this.chainId = chainId;
-    this.addresses = override ?? addressesByNetwork[this.chainId];
+    this.networkId = networkId;
+    this.addresses = override ?? addressesByNetwork[this.networkId];
     this.signer = signer;
     this.provider = new multicall.providers.MulticallProvider(provider);
   }
@@ -261,7 +265,7 @@ export class LooksRare {
   }
 
   /**
-   * Approve all the items of a collection, to eventually be traded on LooksRare
+   * Approve all the items of a collection, to eventually be traded on GUNftMarketplace
    * The spender is the TransferManager.
    * @param collectionAddress Address of the collection to be approved.
    * @param approved true to approve, false to revoke the approval (default to true)
@@ -278,8 +282,8 @@ export class LooksRare {
   }  
 
   /**
-   * Approve an ERC20 to be used as a currency on LooksRare.
-   * The spender is the LooksRareProtocol contract.
+   * Approve an ERC20 to be used as a currency on GUNftMarketplace.
+   * The spender is the GUNftMarketplace contract.
    * @param tokenAddress Address of the ERC20 to approve
    * @param amount Amount to be approved (default to MaxUint256)
    * @returns ContractTransaction
