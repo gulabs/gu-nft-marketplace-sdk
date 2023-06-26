@@ -10,6 +10,7 @@ import { BigNumber, constants, utils } from "ethers";
 import { allowance, isApprovedForAll } from "../utils/calls/tokens";
 import { TypedDataDomain } from "@ethersproject/abstract-signer";
 import { makerTypes } from "../constants/eip712";
+import { SupportedChainId } from "../types/enum";
 
 describe("GUNftMarketplaceSdk", () => {
   let mocks: SetupMocks;
@@ -22,19 +23,19 @@ describe("GUNftMarketplaceSdk", () => {
 
   describe("constructor", () => {
     it("instanciate GUNftMarketplaceSdk object with a signer", () => {
-      expect(new GUNftMarketplaceSdk(1, ethers.provider, signers.user1).chainId).to.equal(1);
-      expect(new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1).chainId).to.equal(
+      expect(new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1).chainId).to.equal(31337);
+      expect(new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1).networkId).to.equal(
         SupportedNetworkId.HARDHAT
       );
     });
     it("instanciate GUNftMarketplaceSdk object with a signer and override addresses", () => {
       const { addresses } = mocks;
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, addresses);
       expect(sdk.addresses).to.be.eql(addresses);
     });
     it("instanciate GUNftMarketplaceSdk object without a signer and reject a contract call", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider);
-      expect(sdk.getTypedDataDomain().chainId).to.be.eql(SupportedNetworkId.HARDHAT);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider);
+      expect(sdk.getTypedDataDomain().chainId).to.be.eql(SupportedChainId.HARDHAT);
       expect(() => sdk.cancelAllOrdersForSender(0)).to.throw(ErrorSigner);
     });
   })
@@ -55,7 +56,7 @@ describe("GUNftMarketplaceSdk", () => {
     })
 
     it("create maker ask with wrong time format", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       await expect(
         sdk.createMakerAsk({ ...baseMakerAskInput, startTime: Date.now() })
       ).to.eventually.be.rejectedWith(ErrorTimestamp);
@@ -65,7 +66,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("approvals checks are false if no approval was made", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const { isCollectionApproved } = await sdk.createMakerAsk(baseMakerAskInput);
       expect(isCollectionApproved).to.be.false;
   
@@ -81,7 +82,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("approval checks are true if approval were made", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const tx = await sdk.approveAllCollectionItems(baseMakerAskInput.collection);
       await tx.wait();
   
@@ -90,7 +91,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("create a simple maker ask with default values", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const output = await sdk.createMakerAsk(baseMakerAskInput);
       const makerOrder: MakerOrder = {
         isOrderAsk: true,
@@ -111,7 +112,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("create a simple maker ask with non default values", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const input = {
         ...baseMakerAskInput,
         amount: 2,
@@ -156,7 +157,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("create maker bid with wrong time format", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       await expect(sdk.createMakerBid({ ...baseMakerBidInput, startTime: Date.now() })).to.eventually.be.rejectedWith(
         ErrorTimestamp
       );
@@ -166,8 +167,8 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("approvals checks are false if no approval was made", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
-      const { isCurrencyApproved } = await GUNftMarketplaceSdk.createMakerBid(baseMakerBidInput);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const { isCurrencyApproved } = await sdk.createMakerBid(baseMakerBidInput);
   
       expect(isCurrencyApproved).to.be.false;
   
@@ -182,7 +183,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("approval checks are true if approval were made", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const tx = await sdk.approveErc20(sdk.addresses.WETH);
       await tx.wait();
       const { isCurrencyApproved } = await sdk.createMakerBid(baseMakerBidInput);
@@ -190,7 +191,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("create a simple maker bid with default values", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const output = await sdk.createMakerBid(baseMakerBidInput);
       const makerOrder: MakerOrder = {
         isOrderAsk: false,
@@ -211,7 +212,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("create a simple maker bid with non default values", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const input = {
         ...baseMakerBidInput,
         amount: 2,
@@ -256,7 +257,7 @@ describe("GUNftMarketplaceSdk", () => {
     })
 
     it("create taker with recipient", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const { maker } = await sdk.createMakerAsk(baseMakerAskInput);
       const taker = sdk.createTaker(maker, { taker: signers.user2.address });
 
@@ -282,14 +283,14 @@ describe("GUNftMarketplaceSdk", () => {
     domain = {
       name: "GUNftMarketplaceExchange",
       version: "1",
-      chainId: SupportedNetworkId.HARDHAT,
+      chainId: SupportedChainId.HARDHAT,
       verifyingContract: mocks.addresses.EXCHANGE,
     };
       
   });
   describe("Sign single maker orders", () => {
     it("sign maker ask order", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
 
       const makerOrder: MakerOrder = {
         isOrderAsk: true,
@@ -330,7 +331,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("sign maker bid order", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
 
       const makerOrder: MakerOrder = {
         isOrderAsk: false,
@@ -388,8 +389,8 @@ describe("GUNftMarketplaceSdk", () => {
     })
 
     it("execute maker ask and taker bid using ETH", async () => {
-      const sdkUser1 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
-      const sdkUser2 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
+      const sdkUser1 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdkUser2 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
       
       const { maker } = await sdkUser1.createMakerAsk(baseMakerAskInput);
       const signature = await sdkUser1.signMakerOrder(maker);
@@ -411,8 +412,8 @@ describe("GUNftMarketplaceSdk", () => {
     })
 
     it("execute maker ask and taker bid using ETH + WETH", async () => {
-      const sdkUser1 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
-      const sdkUser2 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
+      const sdkUser1 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdkUser2 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
       
       const { maker } = await sdkUser1.createMakerAsk(baseMakerAskInput);
       const signature = await sdkUser1.signMakerOrder(maker);
@@ -442,8 +443,8 @@ describe("GUNftMarketplaceSdk", () => {
         ...baseMakerAskInput,
         currency: mocks.contracts.usdt.address
       }
-      const sdkUser1 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
-      const sdkUser2 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
+      const sdkUser1 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdkUser2 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
       
       const { maker } = await sdkUser1.createMakerAsk(input);
       const signature = await sdkUser1.signMakerOrder(maker);
@@ -468,8 +469,8 @@ describe("GUNftMarketplaceSdk", () => {
     })
 
     it("execute maker bid and taker ask using WETH", async () => {
-      const sdkUser1 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
-      const sdkUser2 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
+      const sdkUser1 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdkUser2 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
       
       const { maker } = await sdkUser2.createMakerBid(baseMakerAskInput);
       const signature = await sdkUser2.signMakerOrder(maker);
@@ -498,8 +499,8 @@ describe("GUNftMarketplaceSdk", () => {
         ...baseMakerAskInput,
         currency: mocks.contracts.usdt.address
       }
-      const sdkUser1 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
-      const sdkUser2 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
+      const sdkUser1 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdkUser2 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
       
       const { maker } = await sdkUser2.createMakerBid(input);
       const signature = await sdkUser2.signMakerOrder(maker);
@@ -523,9 +524,9 @@ describe("GUNftMarketplaceSdk", () => {
       expect(receipt.status).to.be.equal(1);
     })
 
-    it.only("execute collection offer maker bid and taker ask using ERC20", async () => {
-      const sdkUser1 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
-      const sdkUser2 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
+    it("execute collection offer maker bid and taker ask using ERC20", async () => {
+      const sdkUser1 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdkUser2 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
       
       const { maker } = await sdkUser2.createMakerCollectionOffer({
         collection: mocks.contracts.collectionERC721.address,
@@ -575,8 +576,8 @@ describe("GUNftMarketplaceSdk", () => {
     })
 
     it("cancel all maker order for user", async () => {
-      const sdkUser1 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
-      const sdkUser2 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
+      const sdkUser1 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdkUser2 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
 
       // order 1
       const { maker: maker1 } = await sdkUser1.createMakerAsk(baseMakerAskInput);
@@ -631,8 +632,8 @@ describe("GUNftMarketplaceSdk", () => {
     })
 
     it("cancel multiples maker order by nonces", async () => {
-      const sdkUser1 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
-      const sdkUser2 = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
+      const sdkUser1 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdkUser2 = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user2, mocks.addresses);
 
       // order 1
       const { maker: maker1 } = await sdkUser1.createMakerAsk(baseMakerAskInput);
@@ -687,7 +688,7 @@ describe("GUNftMarketplaceSdk", () => {
     })
 
     it("verify maker ask orders", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const { maker } = await sdk.createMakerAsk(baseMakerInput);
       const signature = await sdk.signMakerOrder(maker);
   
@@ -702,7 +703,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("verify maker bid orders", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const { maker } = await sdk.createMakerBid(baseMakerInput);
       const signature = await sdk.signMakerOrder(maker);
   
@@ -733,7 +734,7 @@ describe("GUNftMarketplaceSdk", () => {
     })
 
     it("verify maker orders", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const { maker: maker1 } = await sdk.createMakerAsk(baseMakerInput);
       const signature1 = await sdk.signMakerOrder(maker1);
       const { maker: maker2 } = await sdk.createMakerBid(baseMakerInput);
@@ -766,7 +767,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("create maker collection offer with wrong time format", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       await expect(sdk.createMakerCollectionOffer({ ...baseMakerCollectionInput, startTime: Date.now() })).to.eventually.be.rejectedWith(
         ErrorTimestamp
       );
@@ -776,7 +777,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("approvals checks are false if no approval was made", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const { isCurrencyApproved } = await sdk.createMakerCollectionOffer(baseMakerCollectionInput);
   
       expect(isCurrencyApproved).to.be.false;
@@ -792,7 +793,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("approval checks are true if approval were made", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const tx = await sdk.approveErc20(sdk.addresses.WETH);
       await tx.wait();
       const { isCurrencyApproved } = await sdk.createMakerCollectionOffer(baseMakerCollectionInput);
@@ -800,7 +801,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("create a simple maker collection offer with default values", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const output = await sdk.createMakerCollectionOffer(baseMakerCollectionInput);
       const makerOrder: MakerOrder = {
         isOrderAsk: false,
@@ -821,7 +822,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("create a simple maker collection offer with non default values", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const input = {
         ...baseMakerCollectionInput,
         amount: 2,
@@ -864,7 +865,7 @@ describe("GUNftMarketplaceSdk", () => {
     });
 
     it("create taker collection offer with recipient", async () => {
-      const sdk = new GUNftMarketplaceSdk(SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
+      const sdk = new GUNftMarketplaceSdk(SupportedChainId.HARDHAT, SupportedNetworkId.HARDHAT, ethers.provider, signers.user1, mocks.addresses);
       const { maker } = await sdk.createMakerCollectionOffer(baseMakerCollectionInput);
       const taker = sdk.createTakerCollectionOffer(maker, 1, { taker: signers.user2.address });
 

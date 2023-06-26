@@ -1,4 +1,5 @@
 import { ChainInfo, SupportedNetworkId } from "../types";
+import { SupportedChainId } from "../types/enum";
 
 export const GU_SANDBOX_DEV_BASE_API_URL = ""
 export const GU_SANDBOX_TEST_BASE_API_URL = "https://test.api.nft-marketplace.gu.net"
@@ -31,6 +32,6 @@ export const CHAIN_INFO: { [chainId in SupportedNetworkId]: ChainInfo } = {
   },
 };
 
-export const isSupportedChain = (chainId: string): chainId is SupportedNetworkId => {
-  return Object.values(SupportedNetworkId).includes(chainId);
+export const isSupportedChain = (chainId: number): chainId is SupportedChainId => {
+  return Object.values(SupportedChainId).includes(chainId);
 };

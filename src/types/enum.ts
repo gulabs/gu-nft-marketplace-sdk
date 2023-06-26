@@ -5,7 +5,8 @@ export enum SupportedNetworkId {
 }
 
 export enum SupportedChainId {
-  GU_SANDBOX = 99999
+  GU_SANDBOX = 99999,
+  HARDHAT = 31337
 }
 
 /**
