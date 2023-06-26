@@ -1,6 +1,6 @@
 import {  ethers, PayableOverrides } from "ethers";
 import { ContractMethods, MakerOrder, MakerOrderWithVRS, Signer, TakerOrder } from "../../types";
-import LooksRareExchangeAbi from "../../abis/LooksRareExchange.json";
+import exchangeAbi from "../../abis/GUNftMarketplaceExchange.json";
 
 export const matchAskWithTakerBidUsingETHAndWETH = (
   signer: Signer,
@@ -10,7 +10,7 @@ export const matchAskWithTakerBidUsingETHAndWETH = (
   makerSignature: string,
   overrides?: PayableOverrides
 ): ContractMethods => {
-  const contract = new ethers.Contract(exchange, LooksRareExchangeAbi, signer);
+  const contract = new ethers.Contract(exchange, exchangeAbi, signer);
   const { v, r, s } = ethers.utils.splitSignature(makerSignature);
   
   const makerAskAndSignature: MakerOrderWithVRS = { ...makerAsk, r, v, s };
@@ -42,7 +42,7 @@ export const matchAskWithTakerBid = (
   makerSignature: string,
   overrides?: PayableOverrides
 ): ContractMethods => {
-  const contract = new ethers.Contract(exchange, LooksRareExchangeAbi, signer);
+  const contract = new ethers.Contract(exchange, exchangeAbi, signer);
   const { v, r, s } = ethers.utils.splitSignature(makerSignature);
   
   const makerAskAndSignature: MakerOrderWithVRS = { ...makerAsk, r, v, s };
@@ -74,7 +74,7 @@ export const matchBidWithTakerAsk = (
   makerSignature: string,
   overrides?: PayableOverrides
 ): ContractMethods => {
-  const contract = new ethers.Contract(exchange, LooksRareExchangeAbi, signer);
+  const contract = new ethers.Contract(exchange, exchangeAbi, signer);
   const { v, r, s } = ethers.utils.splitSignature(makerSignature);
   
   const makerAskAndSignature: MakerOrderWithVRS = { ...makerBid, r, v, s };

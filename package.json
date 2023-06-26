@@ -1,6 +1,6 @@
 {
-  "name": "@looksrare/sdk",
-  "version": "0.12.1",
+  "name": "@gu-nft-marketplace/sdk",
+  "version": "0.9.0",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -13,13 +13,15 @@
     "registry": "https://test.gusdk.gu.net"
   },
   "keywords": [
-    "looksrare"
+    "marketplace",
+    "nft",
+    "sdk"
   ],
-  "homepage": "https://looksrare.org/",
-  "bugs": "https://github.com/LooksRare/looksrare-sdk/issues",
+  "homepage": "https://www.gu.net/",
+  "bugs": "https://github.com/gulabs/gu-nft-marketplace-contracts/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LooksRare/looksrare-sdk.git"
+    "url": "https://github.com/gulabs/gu-nft-marketplace-sdk.git"
   },
   "scripts": {
     "prebuild": "rm -rf ./src/typechain ./src/artifacts cache dist",
@@ -75,6 +77,6 @@
   },
   "dependencies": {
     "@0xsequence/multicall": "^0.43.25",
-    "@looksrare/contracts-exchange-v1": "^1.4.1"
+    "@gu-nft-marketplace/contracts": "^0.9.0"
   }
 }

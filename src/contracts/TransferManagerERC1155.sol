@@ -1,4 +1,4 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "@looksrare/contracts-exchange-v1/contracts/transferManagers/TransferManagerERC1155.sol";
+import "@gu-nft-marketplace/contracts/contracts/transferManagers/TransferManagerERC1155.sol";

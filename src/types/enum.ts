@@ -1,12 +1,16 @@
+export enum SupportedNetworkId {
+  GU_SANDBOX_DEV = "gu-sandbox-dev",
+  GU_SANDBOX_TEST = "gu-sandbox-test",
+  HARDHAT = "hardhat"
+}
+
 export enum SupportedChainId {
-  MAINNET = 1,
-  GOERLI = 5,
-  HARDHAT = 31337,
-  GU_SANDBOX = 99999
+  GU_SANDBOX = 99999,
+  HARDHAT = 31337
 }
 
 /**
- * https://github.com/LooksRare/contracts-exchange-v1/blob/master/contracts/orderValidation/ValidationCodeConstants.sol
+ * https://github.com/gulabs/gu-nft-marketplace-contracts/blob/master/contracts/orderValidation/ValidationCodeConstants.sol
  */
 export enum OrderValidatorEnum {
   ORDER_EXPECTED_TO_BE_VALID = 0,

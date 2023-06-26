@@ -5,16 +5,9 @@ export interface ChainInfo {
   explorer: string;
   baseApiUrl: string;
   apiUrl: string;
-  osApiUrl: string;
-  cdnUrl: string;
-  rewardsSubgraphUrl: string;
-  cloudinaryUrl: string;
 }
 
 export interface Addresses {
-  LOOKS: string;
-  LOOKS_LP: string;
-  LOOKS_LP_UNIV3: string;
   WETH: string;
   ROYALTY_FEE_MANAGER: string;
   ROYALTY_FEE_REGISTRY: string;
@@ -29,15 +22,6 @@ export interface Addresses {
   STRATEGY_COLLECTION_SALE: string;
   STRATEGY_PRIVATE_SALE: string;
   STRATEGY_DUTCH_AUCTION: string;
-  PRIVATE_SALE_WITH_FEE_SHARING: string;
-  FEE_SHARING_SYSTEM: string;
-  STAKING_POOL_FOR_LOOKS_LP: string;
-  TOKEN_DISTRIBUTOR: string;
-  TRADING_REWARDS_DISTRIBUTOR: string;
-  MULTI_REWARDS_DISTRIBUTOR: string;
-  MULTICALL2: string;
-  REVERSE_RECORDS: string;
-  AGGREGATOR_UNISWAP_V3: string;
   EXECUTION_MANAGER: string;
   CURRENCY_MANAGER: string;
   ORDER_VALIDATOR_V1: string;

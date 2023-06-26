@@ -1,6 +1,6 @@
 import { BigNumber, BigNumberish, CallOverrides, Contract, ethers, Overrides, providers } from "ethers";
 import { ContractMethods, Signer } from "../../types";
-import LooksRareExchangeAbi from "../../abis/LooksRareExchange.json";
+import exchangeAbi from "../../abis/GUNftMarketplaceExchange.json";
 
 export const userMinOrderNonce = (
   signerOrProvider: providers.Provider | Signer,
@@ -8,7 +8,7 @@ export const userMinOrderNonce = (
   signerAddress: string,
   overrides?: CallOverrides
 ): Promise<BigNumber> => {
-  const contract = new Contract(exchange, LooksRareExchangeAbi, signerOrProvider);
+  const contract = new Contract(exchange, exchangeAbi, signerOrProvider);
   return contract.userMinOrderNonce(signerAddress, { ...overrides });
 };
 
@@ -18,7 +18,7 @@ export const cancelAllOrdersForSender = (
   minNonce: BigNumberish,
   overrides?: Overrides
 ): ContractMethods => {
-  const contract = new ethers.Contract(exchange, LooksRareExchangeAbi, signer);
+  const contract = new ethers.Contract(exchange, exchangeAbi, signer);
   return {
     call: (additionalOverrides?: Overrides) =>
       contract.cancelAllOrdersForSender(minNonce, { ...overrides, ...additionalOverrides }),
@@ -35,7 +35,7 @@ export const cancelMultipleMakerOrders = (
   orderNonces: BigNumberish[],
   overrides?: Overrides
 ): ContractMethods => {
-  const contract = new ethers.Contract(exchange, LooksRareExchangeAbi, signer);
+  const contract = new ethers.Contract(exchange, exchangeAbi, signer);
   return {
     call: (additionalOverrides?: Overrides) =>
       contract.cancelMultipleMakerOrders(orderNonces, { ...overrides, ...additionalOverrides }),
