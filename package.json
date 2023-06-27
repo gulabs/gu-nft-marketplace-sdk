@@ -1,5 +1,5 @@
 {
-  "name": "@gu-nft-marketplace/sdk",
+  "name": "@gulabs/gu-nft-marketplace-sdk",
   "version": "0.9.0",
   "license": "MIT",
   "main": "dist/index.cjs.js",
@@ -77,6 +77,6 @@
   },
   "dependencies": {
     "@0xsequence/multicall": "^0.43.25",
-    "@gu-nft-marketplace/contracts": "^0.9.0"
+    "@gulabs/gu-nft-marketplace-contracts": "^0.9.0"
   }
 }
