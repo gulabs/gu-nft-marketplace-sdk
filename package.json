@@ -1,6 +1,6 @@
 {
   "name": "@gulabs/gu-nft-marketplace-sdk",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -10,7 +10,7 @@
   ],
   "publishConfig": {
     "access": "public",
-    "registry": "https://test.gusdk.gu.net"
+    "registry": "https://registry.npmjs.org"
   },
   "keywords": [
     "marketplace",
