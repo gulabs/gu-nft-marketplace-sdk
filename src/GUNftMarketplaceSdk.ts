@@ -233,9 +233,9 @@ export class GUNftMarketplaceSdk {
   ): ContractMethods {
     const signer = this.getSigner();
     let execute;
-    if (maker.isOrderAsk && maker.currency === this.addresses.WETH) {
+    if (maker.isOrderAsk && maker.currency.toLowerCase() === this.addresses.WETH.toLowerCase()) {
       execute = matchAskWithTakerBidUsingETHAndWETH
-    } else if (maker.isOrderAsk && maker.currency !== this.addresses.WETH) {
+    } else if (maker.isOrderAsk && maker.currency.toLowerCase() !== this.addresses.WETH.toLowerCase()) {
       execute = matchAskWithTakerBid
     } else {
       execute = matchBidWithTakerAsk
